@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111114">
+<title>little secret phone</title>
+<style>
+:root{--ink:#17171b;--muted:#85858e;--glass:rgba(255,255,255,.17);--line:rgba(255,255,255,.18)}
+*{box-sizing:border-box} body{margin:0;min-height:100svh;background:radial-gradient(ellipse at 20% 10%,#5b5a72 0,#262631 38%,#101014 100%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;display:flex;align-items:center;justify-content:center;padding:20px}
+button,input,textarea{font:inherit} button{cursor:pointer}
+.stage{width:min(100%,410px);display:flex;flex-direction:column;align-items:center;gap:14px}
+.hint{font-size:12px;letter-spacing:.12em;color:#d0cfdb;text-transform:uppercase}
+.phone{width:min(100%,365px);height:min(790px,calc(100svh - 78px));min-height:600px;position:relative;border:8px solid #09090b;border-radius:48px;background:#d4d0df;box-shadow:0 25px 70px #0009,inset 0 0 0 1px #777;overflow:hidden}
+.screen{position:absolute;inset:0;border-radius:39px;overflow:hidden;background:linear-gradient(150deg,#d7d5e4,#a7a7ba 48%,#777b92);color:#fff}
+.wallpaper{position:absolute;inset:0;background:linear-gradient(155deg,rgba(20,22,36,.10),rgba(15,14,27,.32)),radial-gradient(ellipse at 75% 22%,#d4b9c4 0,transparent 35%),radial-gradient(ellipse at 22% 58%,#6b7f8c 0,transparent 40%),linear-gradient(140deg,#9ba9b5,#696982 45%,#d1a8a2);filter:saturate(.82)}
+.status{position:absolute;z-index:4;top:14px;left:24px;right:24px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;text-shadow:0 1px 4px #0004}
+.dynamic{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:104px;height:27px;background:#050506;border-radius:20px;z-index:5}
+.home{position:absolute;inset:52px 18px 58px;z-index:2;display:flex;flex-direction:column}
+.widgets{display:flex;justify-content:space-between;gap:8px;margin:4px 0 24px}
+.widget{flex:1;background:#ffffff25;border:1px solid #ffffff20;border-radius:17px;padding:10px 11px;backdrop-filter:blur(12px);min-height:83px}
+.widget .small{font-size:10px;opacity:.85}.widget .big{font-size:24px;font-weight:650;margin-top:3px}.widget .sub{font-size:10px;margin-top:1px}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 8px}
+.app-icon{border:0;background:transparent;color:white;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;min-width:0;text-shadow:0 1px 5px #0006}
+.icon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font-size:26px;box-shadow:0 5px 14px #0002;position:relative}
+.icon.msg{background:linear-gradient(#9cf19c,#30c66a)}.icon.photo{background:linear-gradient(145deg,#fff,#e8e8ee);color:#f47a86}.icon.music{background:linear-gradient(145deg,#ff819a,#d52b6c)}.icon.notes{background:linear-gradient(145deg,#fff5a5,#e9d95b);color:#554b2a}.icon.lock{background:linear-gradient(145deg,#8f9ef8,#5453b9)}.icon.secret{background:linear-gradient(145deg,#30313b,#09090c)}
+.app-name{font-size:10px;white-space:nowrap}
+.dock{position:absolute;bottom:12px;left:15px;right:15px;height:72px;border-radius:24px;background:#ffffff36;border:1px solid #ffffff22;backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-evenly;z-index:3}
+.dock .icon{width:47px;height:47px}
+.homebar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:105px;height:4px;background:#fff;border-radius:4px;z-index:9}
+.appview{position:absolute;inset:0;z-index:6;background:#f5f5f8;color:#17171b;display:none;flex-direction:column}
+.appview.open{display:flex}
+.apphead{height:66px;padding:26px 17px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dddde4;background:#f5f5f8}
+.apphead strong{font-size:16px}.back{border:0;background:transparent;color:#3678e8;font-size:14px;padding:6px}
+.content{padding:17px;overflow:auto;flex:1}
+.muted{color:#85858e;font-size:12px}.chatlist{display:flex;flex-direction:column;gap:12px}
+.chatrow{display:flex;align-items:center;gap:11px;background:white;border:0;text-align:left;padding:12px;border-radius:15px;color:#19191d;width:100%}
+.avatar{width:43px;height:43px;border-radius:50%;background:linear-gradient(145deg,#f4c3d3,#9ca8db);display:grid;place-items:center;font-size:21px;flex-shrink:0}
+.chatrow b{font-size:14px}.chatrow p{margin:4px 0 0;color:#777;font-size:12px}
+.bubble{max-width:82%;padding:11px 13px;border-radius:17px;margin:9px 0;font-size:14px;line-height:1.4}
+.bubble.in{background:#e6e6eb;border-bottom-left-radius:5px}.bubble.out{background:#2e9bfa;color:white;margin-left:auto;border-bottom-right-radius:5px}
+.thread{display:flex;flex-direction:column}.thread-note{font-size:11px;color:#888;text-align:center;margin:12px 0}
+.photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.photo-tile{border:0;min-height:145px;border-radius:15px;color:#fff;font-size:36px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:12px;text-shadow:0 2px 5px #0005}
+.photo-tile span{font-size:11px;margin-top:5px}
+.p1{background:linear-gradient(145deg,#d7b8c5,#657a9a)}.p2{background:linear-gradient(145deg,#f2d3a0,#b56d71)}.p3{background:linear-gradient(145deg,#a9c8ba,#526d78)}.p4{background:linear-gradient(145deg,#c9c1ec,#68658c)}
+.song{background:linear-gradient(145deg,#f8b5c7,#8e6fa8);aspect-ratio:1;border-radius:22px;display:grid;place-items:center;font-size:70px;margin:0 auto 18px;width:80%}
+.center{text-align:center}.play{border:0;border-radius:30px;background:#17171b;color:#fff;padding:12px 26px;margin-top:18px}
+.note-card{background:#fff7c7;border-radius:14px;padding:14px;margin-bottom:12px;line-height:1.5;font-size:13px}
+.secret-card{background:#fff;border-radius:16px;padding:17px;margin-bottom:12px}
+.secret-card h3{margin:0 0 7px;font-size:15px}.secret-card p{font-size:13px;line-height:1.5;color:#555;margin:0}
+.passdots{display:flex;gap:13px;justify-content:center;margin:22px 0}.dot{width:10px;height:10px;border:1px solid #5d5d66;border-radius:50%}.dot.filled{background:#24242a}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:250px;margin:0 auto}.key{height:53px;border:0;border-radius:18px;background:#e5e5eb;font-size:20px;color:#17171b}.key small{display:block;font-size:9px;color:#777}
+.passmsg{min-height:22px;text-align:center;color:#bd4354;font-size:12px;margin:10px}
+.reveal{background:linear-gradient(145deg,#25233b,#54406e);color:#fff;border-radius:18px;padding:23px;text-align:center;line-height:1.6}
+.reveal .emoji{font-size:54px}
+.close-x{border:0;background:transparent;font-size:20px;color:#777}
+.toast{position:absolute;z-index:10;left:50%;bottom:28px;transform:translateX(-50%);background:#17171be8;color:#fff;border-radius:20px;padding:10px 15px;font-size:12px;white-space:nowrap;display:none}
+@media(max-height:680px){.phone{height:calc(100svh - 55px);min-height:560px}.widgets{margin-bottom:16px}.apps{gap:15px 8px}.icon{width:47px;height:47px}.dock{height:65px}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="hint">a tiny phone full of secrets ✦</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="wallpaper"></div>
+      <div class="status"><span>9:41 ◐</span><span>▮▮▮　Wi-Fi　▰</span></div><div class="dynamic"></div>
+      <div class="home" id="home">
+        <div class="widgets">
+          <div class="widget"><div class="small">MON, OCT 26</div><div class="big">오늘</div><div class="sub">작은 비밀 하나</div></div>
+          <div class="widget"><div class="small">WEATHER</div><div class="big">☁ 18°</div><div class="sub">구름 조금</div></div>
+        </div>
+        <div class="apps">
+          <button class="app-icon" data-app="messages"><span class="icon msg">●</span><span class="app-name">메시지</span></button>
+          <button class="app-icon" data-app="gallery"><span class="icon photo">🌈</span><span class="app-name">사진</span></button>
+          <button class="app-icon" data-app="music"><span class="icon music">♫</span><span class="app-name">음악</span></button>
+          <button class="app-icon" data-app="notes"><span class="icon notes">▤</span><span class="app-name">메모</span></button>
+          <button class="app-icon" data-app="locked"><span class="icon lock">🔒</span><span class="app-name">잠긴 폴더</span></button>
+          <button class="app-icon" data-app="secret"><span class="icon secret">✦</span><span class="app-name">???</span></button>
+          <button class="app-icon" data-app="weather"><span class="icon" style="background:linear-gradient(145deg,#8bd4f5,#577ee5)">☀️</span><span class="app-name">날씨</span></button>
+          <button class="app-icon" data-app="about"><span class="icon" style="background:linear-gradient(145deg,#b5b5bf,#777786)">⚙️</span><span class="app-name">설정</span></button>
+        </div>
+      </div>
+      <div class="dock">
+        <button class="app-icon" data-app="messages"><span class="icon msg">●</span></button>
+        <button class="app-icon" data-app="gallery"><span class="icon photo">🌈</span></button>
+        <button class="app-icon" data-app="music"><span class="icon music">♫</span></button>
+        <button class="app-icon" data-app="notes"><span class="icon notes">▤</span></button>
+      </div>
+      <section class="appview" id="messages">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>메시지</strong><span></span></header>
+        <div class="content"><div class="muted" style="margin-bottom:12px">최근 대화</div>
+          <button class="chatrow" id="openThread"><span class="avatar">🧸</span><span><b>비밀 친구</b><p>너 지금 이 폰 구경 중이지 👀</p></span></button>
+          <button class="chatrow" id="openGroup"><span class="avatar" style="background:linear-gradient(145deg,#b9d8bd,#e7d8a6)">💬</span><span><b>우리들의 방</b><p>마지막으로 남긴 메시지…</p></span></button>
+          <div id="thread" style="display:none" class="thread"><button class="back" id="threadBack" style="align-self:flex-start">‹ 대화 목록</button><div class="thread-note">오늘 오후 9:41</div><div class="bubble in">여기까지 찾아왔네? 👀</div><div class="bubble in">사진첩이랑 메모도 확인해 봐.</div><div class="bubble out">뭐가 있는데??</div><div class="bubble in">쉿. 잠긴 폴더의 힌트는 메모에 있어.</div><div class="bubble in">그리고 별 모양 앱도 잊지 마 ✦</div></div>
+          <div id="groupThread" style="display:none" class="thread"><button class="back" id="groupBack" style="align-self:flex-start">‹ 대화 목록</button><div class="thread-note">우리들의 방 · 오늘</div><div class="bubble in">오늘의 미션: 이 폰에 숨겨진 걸 전부 찾아라!</div><div class="bubble out">힌트는 어디에?</div><div class="bubble in">메모를 잘 읽어봐. 첫 번째 숫자는 네가 제일 좋아하는 계절의 달… 🌙</div></div>
+        </div>
+      </section>
+      <section class="appview" id="gallery">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>사진</strong><span class="muted">최근 항목</span></header>
+        <div class="content"><p class="muted">이 폰에 남겨진 사진들</p><div class="photo-grid">
+          <button class="photo-tile p1" data-photo="달빛 아래 남겨진 메모">🌙<span>달빛 아래</span></button>
+          <button class="photo-tile p2" data-photo="그날의 작은 약속">🌷<span>작은 약속</span></button>
+          <button class="photo-tile p3" data-photo="돌아오는 길에">🌿<span>돌아오는 길</span></button>
+          <button class="photo-tile p4" data-photo="별 하나, 비밀 하나">✨<span>별 하나</span></button>
+        </div><div id="photoCaption" class="secret-card" style="display:none;margin-top:13px"></div></div>
+      </section>
+      <section class="appview" id="music">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>음악</strong><span></span></header>
+        <div class="content center"><p class="muted">지금 재생 중</p><div class="song">🌙</div><h2 style="margin:0 0 5px">midnight memo</h2><div class="muted">unknown artist · demo track</div><div style="height:5px;background:#ddd;border-radius:5px;margin:28px 0 8px"><div id="progress" style="height:5px;width:18%;background:#333;border-radius:5px"></div></div><div class="muted" style="display:flex;justify-content:space-between"><span>0:18</span><span>3:02</span></div><button class="play" id="playMusic">▶　재생</button><p class="muted" style="margin-top:22px">* 데모 화면이라 실제 음원은 재생되지 않아.</p></div>
+      </section>
+      <section class="appview" id="notes">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>메모</strong><button class="back" id="editNote">편집</button></header>
+        <div class="content"><div class="note-card"><b>📌 꼭 기억하기</b><p>잠긴 폴더의 비밀번호는 숫자 1과 0이야. 키패드에서 1, 0을 누르고 ✓를 눌러.</p></div><div class="note-card"><b>✦ 미션</b><p>메시지에서 힌트를 찾고, 사진 네 장을 눌러 봐. 마지막에는 별 모양 앱을 열어 봐.</p></div><div class="note-card"><b>📝 나중에 할 일</b><p>이 페이지를 만든 사람에게 “다 찾았다!”라고 말하기.</p></div><textarea id="personalNote" placeholder="여기에 네 메모를 적어봐 (이 기기에 저장되지 않는 임시 입력이야)" style="width:100%;height:75px;border:1px solid #ddd;border-radius:12px;padding:10px;background:white;color:#222"></textarea></div>
+      </section>
+      <section class="appview" id="locked">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>잠긴 폴더</strong><span></span></header>
+        <div class="content center"><div style="font-size:45px;margin:18px">🔒</div><h2 style="margin:0">비밀 폴더</h2><p class="muted">메모 앱의 힌트를 찾아봐.</p><div class="passdots" id="passdots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="keypad" id="keypad"></div><div class="passmsg" id="passmsg"></div><button class="back" id="clearPass">지우기</button><div id="lockedReveal" style="display:none" class="reveal"><div class="emoji">💌</div><h2>비밀 해제!</h2><p>여기까지 찾아왔구나.<br>너에게 전할 말이 있어.</p><p>이 사이트를 끝까지 탐험해 줘서 고마워!<br>오늘도 네 하루에 작은 행운이 있기를 ✨</p></div></div>
+      </section>
+      <section class="appview" id="secret">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>???</strong><span></span></header>
+        <div class="content"><div class="reveal"><div class="emoji">✦</div><h2>숨겨진 이벤트</h2><p>앗, 비밀 앱을 발견했어!</p><p>이건 누군가를 위해 준비한 작은 깜짝 선물이야. 🎁</p><button class="play" id="surprise">선물 열기</button><div id="surpriseText" style="display:none;margin-top:17px">🎉 짜잔! 오늘의 행운을 발견했습니다.<br><b>특별 미션 성공!</b><br>메시지 · 사진 · 메모 · 잠긴 폴더를 모두 확인했다면 완벽해.</div></div></div>
+      </section>
+      <section class="appview" id="weather">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>날씨</strong><span></span></header>
+        <div class="content center"><div style="font-size:65px;margin-top:45px">☁️</div><div style="font-size:48px">18°</div><p>구름 조금</p><p class="muted">오늘은 비밀을 발견하기 좋은 날.</p></div>
+      </section>
+      <section class="appview" id="about">
+        <header class="apphead"><button class="back" data-home>‹ 홈</button><strong>설정</strong><span></span></header>
+        <div class="content"><div class="secret-card"><h3>little secret phone</h3><p>친구에게 보여주기 위한 가상의 인터랙티브 휴대폰입니다.</p></div><div class="secret-card"><h3>편집 팁</h3><p>index.html 파일을 수정하면 이름, 메시지, 비밀번호, 색상과 미션을 바꿀 수 있어요.</p></div><div class="secret-card"><h3>개인정보 안내</h3><p>이 데모는 서버나 실제 메시지에 연결되지 않아요. 단, 공개 사이트에 실제 개인정보나 민감한 내용을 넣지 마세요.</p></div></div>
+      </section>
+      <div class="homebar"></div><div class="toast" id="toast"></div>
+    </div>
+  </div>
+  <div class="hint">tap around · find the little secret</div>
+</div>
+<script>
+const views=[...document.querySelectorAll('.appview')];
+function home(){views.forEach(v=>v.classList.remove('open'));document.getElementById('home').style.display='flex';document.querySelector('.dock').style.display='flex';}
+function openApp(id){views.forEach(v=>v.classList.remove('open'));const v=document.getElementById(id);if(v){v.classList.add('open');document.getElementById('home').style.display='none';document.querySelector('.dock').style.display='none';}}
+document.querySelectorAll('[data-app]').forEach(b=>b.addEventListener('click',()=>openApp(b.dataset.app)));
+document.querySelectorAll('[data-home]').forEach(b=>b.addEventListener('click',home));
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',1800);}
+document.getElementById('openThread').onclick=()=>{document.getElementById('thread').style.display='flex';document.getElementById('groupThread').style.display='none';};
+document.getElementById('openGroup').onclick=()=>{document.getElementById('groupThread').style.display='flex';document.getElementById('thread').style.display='none';};
+document.getElementById('threadBack').onclick=()=>document.getElementById('thread').style.display='none';
+document.getElementById('groupBack').onclick=()=>document.getElementById('groupThread').style.display='none';
+document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{const c=document.getElementById('photoCaption');c.style.display='block';c.innerHTML='<h3 style="margin:0 0 6px;font-size:15px">'+b.dataset.photo+'</h3><p style="margin:0;font-size:13px;color:#555">이 사진에 작은 힌트가 숨어 있을지도… ✨</p>';toast('사진을 발견했어!');});
+let playing=false;document.getElementById('playMusic').onclick=()=>{playing=!playing;document.getElementById('playMusic').textContent=playing?'Ⅱ　일시정지':'▶　재생';document.getElementById('progress').style.width=playing?'42%':'18%';if(playing)toast('데모 재생 상태');};
+document.getElementById('editNote').onclick=()=>{const n=document.getElementById('personalNote');n.focus();toast('아래 입력란에 메모를 적어봐');};
+document.getElementById('surprise').onclick=()=>{document.getElementById('surpriseText').style.display='block';document.getElementById('surprise').textContent='🎉 열었어!';};
+let pin='';const demoPin='10'; // CHANGE THIS: demo password is "10"; replace with any two-digit string.
+const keypad=document.getElementById('keypad');
+['1','2','3','4','5','6','7','8','9','⌫','0','✓'].forEach(k=>{const b=document.createElement('button');b.className='key';b.textContent=k;b.onclick=()=>{if(k==='⌫'){pin=pin.slice(0,-1);}else if(k==='✓'){checkPin();return;}else if(pin.length<4){pin+=k;}renderPin();};keypad.appendChild(b);});
+function renderPin(){document.querySelectorAll('#passdots .dot').forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+function checkPin(){const msg=document.getElementById('passmsg');if(pin===demoPin){document.getElementById('lockedReveal').style.display='block';msg.textContent='';toast('비밀 폴더가 열렸어!');}else{msg.textContent='비밀번호가 달라. 메모의 힌트를 확인해 봐!';pin='';renderPin();}}
+document.getElementById('clearPass').onclick=()=>{pin='';renderPin();document.getElementById('passmsg').textContent='';};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')home();});
+</script>
+</body>
+</html>
